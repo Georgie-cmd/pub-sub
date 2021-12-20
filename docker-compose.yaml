@@ -1,0 +1,47 @@
+version: '3'
+services:
+  redis:
+    image: redis
+    ports:
+      - '6379:6379'
+    networks:
+      - webnet
+  db:
+    image: postgres
+    environment:
+      POSTGRES_USER: postgres
+      POSTGRES_PASSWORD: georgie19111312
+      POSTGRES_DB: new-auth
+    ports:
+      - '5432:5432'
+    networks:
+      - webnet
+    volumes:
+      - pgdata:/var/lib/postgres
+  main:
+    image: main
+    ports:
+      - '5000:5000'
+    environment:
+      REDIS_HOST: redis
+      REDIS_PORT: 6379
+      POSTGRES_HOST: db
+      POSTGRES_PORT: 5432
+      POSTGRES_USER: postgres
+      POSTGRES_PASSWORD: georgie19111312
+      POSTGRES_DB: new-auth
+      SECRET_KEY: secret_key_somesecret
+    depends_on:
+      - db
+      - redis
+    volumes:
+      - .:/app
+    networks:
+      - webnet
+    restart: always
+networks:
+  webnet:
+    driver: bridge
+volumes:
+  pgdata: null
+
